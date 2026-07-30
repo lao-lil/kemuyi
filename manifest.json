@@ -1,0 +1,26 @@
+{
+  "name": "C1 驾照 · 科目一模拟考试",
+  "short_name": "科目一",
+  "description": "智能刷题 + 模拟考试，SM-2 间隔重复算法精选，离线可用",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f8fa",
+  "theme_color": "#1e80ff",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
