@@ -1,0 +1,22 @@
+# 构建产物（由 scripts/build_html.py 生成，CI 自动重建）
+index.html
+manifest.json
+sw.js
+icon-192.png
+icon-512.png
+favicon.png
+
+# 原始大文件（非必需，bank.json 为数据源已足够）
+data/q.json
+data/raw_bank.json
+
+# 系统/编辑器
+.DS_Store
+*.swp
+*~
+__pycache__/
+*.pyc
+
+# 本地学习记录备份（包含个人答题历史，禁止提交）
+backups/
+kemuyi-backup-*.json

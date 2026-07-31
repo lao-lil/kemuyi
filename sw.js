@@ -1,6 +1,6 @@
 // Service Worker — 科目一 PWA
 // 缓存版本随构建注入，更新时自动清理旧缓存
-var CACHE_VER = "kemuyi-20260730212745";
+var CACHE_VER = "kemuyi-20260731143652";
 var SHELL_CACHE = CACHE_VER + "-shell";
 var IMG_CACHE = "kemuyi-imgs";
 

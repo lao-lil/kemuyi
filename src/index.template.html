@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e80ff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="科目一">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<title>C1 驾照 · 科目一模拟考试</title>
+<style>__CSS__</style>
+</head>
+<body>
+
+<!-- ============ 封面页 ============ -->
+<section id="page-cover" class="wrap cover">
+  <div class="logo">🚗</div>
+  <h1>C1 驾照 · 科目一</h1>
+  <p class="sub">智能刷题 + 模拟考试 · 离线可用</p>
+
+  <div class="mode-grid">
+    <button class="mode-card practice" id="btn-practice">
+      <span class="ic">📚</span>
+      <span class="t">刷题练习</span>
+      <span class="d">答对自动下一题</span>
+    </button>
+    <button class="mode-card exam" id="btn-exam">
+      <span class="ic">📝</span>
+      <span class="t">模拟考试</span>
+      <span class="d">限时45分钟</span>
+    </button>
+    <button class="mode-card newq" id="btn-new">
+      <div class="info">
+        <span class="ic" style="font-size:24px">✨</span>
+        <span class="t" style="font-size:15px">新题连续练习</span>
+        <span class="d" id="new-desc">只练从未作答的题 · 无计时</span>
+      </div>
+      <span class="badge"><b id="new-remaining">0</b> 题</span>
+    </button>
+    <button class="mode-card wrong disabled" id="btn-wrong">
+      <div class="info">
+        <span class="ic" style="font-size:24px">❌</span>
+        <span class="t" style="font-size:15px">错题重练</span>
+        <span class="d" id="wrong-desc">暂无错题</span>
+      </div>
+      <span class="badge" id="wrong-badge">0</span>
+    </button>
+  </div>
+
+  <div class="progress-bar">
+    <div class="top"><span>学习进度</span><span id="cv-progress-pct">0%</span></div>
+    <div class="track"><i class="fill" id="cv-progress-fill"></i></div>
+    <div class="meta" id="cv-progress-meta">已学 0 / — 题</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><span class="n" id="cv-bank">—</span><span class="l">题库总量</span></div>
+    <div class="stat"><span class="n green" id="cv-mastered">0</span><span class="l">已掌握</span></div>
+    <div class="stat"><span class="n" id="cv-accuracy">—</span><span class="l">正确率</span></div>
+    <div class="stat"><span class="n" id="cv-streak">0天</span><span class="l">连续学习</span></div>
+  </div>
+
+  <section class="exam-history-panel" aria-labelledby="exam-history-title">
+    <div class="exam-history-heading">
+      <h3 id="exam-history-title">最近模拟考试</h3>
+      <button class="history-toggle hidden" id="exam-history-toggle" type="button">查看全部</button>
+    </div>
+    <div id="exam-history-list"></div>
+  </section>
+
+  <div style="margin-top:14px">
+    <button class="btn ghost small" id="btn-predl">📥 预下载图片库</button>
+    <button class="btn ghost small" id="btn-export">导出记录</button>
+    <button class="btn ghost small" id="btn-import">导入记录</button>
+    <input class="hidden" id="import-file" type="file" accept=".json,application/json">
+    <button class="btn ghost small" id="btn-reset" style="margin-left:6px">↺ 重置进度</button>
+  </div>
+
+  <div class="rule-box">
+    <h3>📌 四种模式说明</h3>
+    <ul>
+      <li><b>刷题练习</b>：基于 SM-2 间隔重复算法智能抽题，优先复习今日到期题目 + 引入新题，答题即时判定并展示解析，专注薄弱点</li>
+      <li><b>新题连续练习</b>：排除所有模式中曾经作答过的题，无计时和题数限制，自动保存位置；答对自动下一题，答错停留看解析</li>
+      <li><b>模拟考试</b>：判断40+单选60共100题，限时45分钟，对标真实上机考试，交卷后统一评定</li>
+      <li><b>错题重练</b>：只练错题本中的题（任何模式答错自动收录，含模考未答题），答对一次即移出错题本</li>
+    </ul>
+    <details>
+      <summary>SM-2 间隔重复算法原理</summary>
+      <p style="margin-top:8px;font-size:12.5px;color:var(--gray-6);line-height:1.7">
+      每题记录难度系数(ease)与复习间隔。答对一题，下次复习间隔会变长（1天→3天→7天→16天→35天…），避免重复刷已掌握的题；答错则重置间隔、降低难度系数，确保薄弱题频繁出现。科学依据艾宾浩斯遗忘曲线，用最少时间巩固最多知识点。
+      </p>
+    </details>
+  </div>
+
+  <div class="info-box">
+    <b>⚠️ 时效性说明</b><br>
+    本题库对应公安部 2022年7月题库（GA/T 1575），已按 <b>2025年1月第172号令</b> 修订年龄相关题目。<b>新能源汽车等2025新增考点未收录</b>，建议考前用驾考App补充。图片题自动缓存可离线查看。
+  </div>
+</section>
+
+<!-- ============ 答题页 ============ -->
+<section id="page-exam" class="hidden">
+  <div class="exam-header">
+    <div class="wrap">
+      <div class="row">
+        <div class="progress"><i id="pg-bar"></i></div>
+        <div class="timer" id="timer">—</div>
+      </div>
+      <div class="meta">
+        <span class="mode-badge practice hidden" id="mb-practice">刷题</span>
+        <span class="mode-badge newq hidden" id="mb-new">新题</span>
+        <span class="mode-badge exam hidden" id="mb-exam">模考</span>
+        <span class="mode-badge wrong hidden" id="mb-wrong">错题</span>
+        第 <b id="cur-no">1</b> / <b id="cur-total">100</b> · 已答 <b id="cur-done">0</b> ·
+        <button class="mark-btn" id="btn-mark">🚩 标记</button>
+        <button class="sheet-toggle" id="btn-sheet">答题卡</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap q-wrap" id="q-area"></div>
+
+  <div class="wrap exam-nav">
+    <button class="btn gray grow" id="btn-prev">‹ 上一题</button>
+    <button class="btn grow" id="btn-next">下一题 ›</button>
+  </div>
+</section>
+
+<!-- 答题卡浮层 -->
+<div class="sheet-mask" id="sheet-mask"></div>
+<div class="sheet" id="sheet">
+  <h4>答题卡 <button class="close" id="sheet-close">收起 ✕</button></h4>
+  <div class="sheet-legend" id="sheet-legend">
+    <span><i style="background:var(--blue);border-color:var(--blue)"></i>已答</span>
+    <span><i></i>未答</span>
+    <span><i style="border-color:var(--orange)"></i>标记</span>
+  </div>
+  <div class="sheet-grid" id="sheet-grid"></div>
+  <div id="sheet-submit-wrap" style="margin-top:16px;text-align:center">
+    <button class="btn" id="btn-submit">交卷</button>
+  </div>
+</div>
+
+<!-- ============ 结果页 ============ -->
+<section id="page-result" class="hidden">
+  <div class="wrap result">
+    <div class="score-ring">
+      <svg width="160" height="160">
+        <circle cx="80" cy="80" r="70" fill="none" stroke="#f0f1f5" stroke-width="12"/>
+        <circle id="score-arc" cx="80" cy="80" r="70" fill="none" stroke="#07c160" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 440"/>
+      </svg>
+      <div class="num"><b id="r-score">0</b><span>分</span></div>
+    </div>
+    <div class="verdict" id="r-verdict">—</div>
+    <div class="verdict-sub" id="r-verdict-sub"></div>
+
+    <div class="summary">
+      <div class="item"><span class="n right" id="r-right">0</span><span class="l">答对</span></div>
+      <div class="item"><span class="n wrong" id="r-wrong">0</span><span class="l">答错</span></div>
+      <div class="item"><span class="n" id="r-time">0′</span><span class="l">用时</span></div>
+    </div>
+
+    <button class="btn" id="btn-again">再考一次</button>
+    <button class="btn ghost" id="btn-result-home" style="margin-left:8px">返回首页</button>
+
+    <div class="review-filter hidden" id="rv-filter">
+      <button class="active" data-f="all">全部</button>
+      <button data-f="wrong">仅错题</button>
+    </div>
+    <div class="review" id="review"></div>
+  </div>
+</section>
+
+<!-- 预下载图片浮层 -->
+<div class="dl-mask" id="dl-mask">
+  <div class="dl-box">
+    <h4 id="dl-title">📥 预下载图片库</h4>
+    <div class="dl-sub" id="dl-sub">将下载全部题目图片至本地，支持离线查看刷题。预计约 50-100MB。</div>
+    <div class="dl-track"><i class="dl-fill" id="dl-fill"></i></div>
+    <div class="dl-num" id="dl-num">准备中…</div>
+    <button class="btn gray small" id="dl-cancel">取消</button>
+  </div>
+</div>
+
+<div class="foot">
+  数据来源：开源项目 doupoa/DrivingTestSubjectOne（banban驾道，对应公安部 GA/T 1575）<br>
+  仅供学习备考，请以最新交规与官方题库为准
+</div>
+
+<script>
+window.__BANK__ = __BANK_JSON__;
+window["__BUILD_VER__"] = "__BUILD_VER__";
+</script>
+<script>
+__APP_JS__
+</script>
+</body>
+</html>
+
